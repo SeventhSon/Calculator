@@ -1,0 +1,22 @@
+.chart-legend {
+   -fx-background-color:  transparent;
+   -fx-padding: 10px;
+}
+ 
+.chart-legend-item-symbol{
+   -fx-background-radius: 0;
+}
+ 
+.chart-legend-item{
+    -fx-text-fill: #191970;
+}
+
+.chart-series-line {    
+    -fx-stroke-width: 2px;
+    -fx-effect: null;
+}
+
+
+.chart-line-symbol{
+	-fx-background-color: transparent ;
+}
