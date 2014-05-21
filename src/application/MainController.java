@@ -8,6 +8,8 @@ import java.util.ResourceBundle;
 
 import javax.imageio.ImageIO;
 
+import de.congrace.exp4j.UnknownFunctionException;
+import de.congrace.exp4j.UnparsableExpressionException;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -22,7 +24,8 @@ import javafx.stage.FileChooser;
 public class MainController implements Initializable {
 	Calculator calculator;
 
-	private double xStart = -10, xEnd = 10, granulity = 100;
+	private double xStart = -10, xEnd = 10;
+	private int granulity = 1000;
 
 	@FXML
 	LineChart<Number, Number> mChart;
@@ -65,8 +68,12 @@ public class MainController implements Initializable {
 			XYChart.Series functionSeries = new XYChart.Series();
 			functionSeries.setName(f.formula);
 			for (int i = 0; i < f.data.length; i++) {
-				XYChart.Data data = new XYChart.Data(f.data[i][0], f.data[i][1]);
-				functionSeries.getData().add(data);
+				if (!Double.isNaN(f.data[i][1]) && f.data[i][1] != Double.POSITIVE_INFINITY && f.data[i][1] != Double.NEGATIVE_INFINITY) {
+					System.out.print(f.data[i][0] + " " + f.data[i][1] + "\n");
+					XYChart.Data data = new XYChart.Data(f.data[i][0],
+							f.data[i][1]);
+					functionSeries.getData().add(data);
+				}
 			}
 			mChart.getData().add(functionSeries);
 		}
@@ -90,9 +97,15 @@ public class MainController implements Initializable {
 	@FXML
 	private void addFunction(ActionEvent event) {
 		if (xStart < xEnd)
-			calculator.addAndCalculate(
-					((TextField) event.getSource()).getText(), xStart, xEnd,
-					(int) ((xEnd - xStart) * 10));
+			try {
+				calculator.addAndCalculate(
+						((TextField) event.getSource()).getText(), xStart, xEnd,
+						granulity);
+				((TextField) event.getSource()).setStyle("-fx-border-color: green;");
+			} catch (UnknownFunctionException | UnparsableExpressionException e) {
+				((TextField) event.getSource()).setStyle("-fx-border-color: red;");
+				//e.printStackTrace();
+			}
 		else
 			System.err.println("Bad domain!");
 	}
