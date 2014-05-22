@@ -1,13 +1,27 @@
 package application;
 
+import javafx.scene.paint.Color;
+
 public class Function {
 
-	public double[][] data;
+	double[][] data;
+	String formula;
+	int size;
+	String type;
+	Color color;
 
-	public String formula;
+	@Override
+	public String toString() {
 
-	public Function(String formula, double[][] data) {
+		return this.formula;
+	}
+
+	public Function(String formula, double[][] data, int size, Color color,
+			String type) {
 		this.formula = formula;
 		this.data = data;
+		this.size = size;
+		this.color = color;
+		this.type = type;
 	}
 }

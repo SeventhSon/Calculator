@@ -11,7 +11,7 @@
 <BorderPane fx:id="mRoot" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="application.MainController">
   <!-- TODO Add Nodes -->
   <center>
-    <LineChart fx:id="mChart" prefWidth="695.0" title="Set Title">
+    <LineChart fx:id="mChart" legendVisible="false" prefWidth="695.0" title="Set Title">
       <xAxis>
         <NumberAxis label="X" side="BOTTOM" />
       </xAxis>
@@ -21,23 +21,40 @@
     </LineChart>
   </center>
   <right>
-    <TitledPane animated="false" prefHeight="403.0" text="Functions">
-      <content>
-        <AnchorPane id="Content" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+    <VBox prefHeight="406.0" prefWidth="194.0001220703125">
+      <children>
+        <TextField fx:id="mFormulaTextBox" onAction="#addFunction" prefWidth="200.0" promptText="Input formula" />
+        <HBox prefHeight="29.0" prefWidth="185.0" spacing="8.0">
           <children>
-            <HBox layoutX="0.0" layoutY="0.0" prefHeight="22.0" prefWidth="200.0">
-              <children>
-                <TextField fx:id="mFormulaTextBox" onAction="#addFunction" prefWidth="200.0" promptText="Input formula" />
-                <Button mnemonicParsing="false" text="+" />
-              </children>
-            </HBox>
+            <ColorPicker fx:id="mColorPicker" />
+            <ChoiceBox fx:id="mTypeBox">
+              <items>
+                <FXCollections fx:factory="observableArrayList">
+                  <String fx:value="Dashed" />
+                  <String fx:value="Dotted" />
+                  <String fx:value="Solid" />
+                </FXCollections>
+              </items>
+            </ChoiceBox>
           </children>
-        </AnchorPane>
-      </content>
-      <BorderPane.margin>
-        <Insets bottom="10.0" right="10.0" top="35.0" />
-      </BorderPane.margin>
-    </TitledPane>
+        </HBox>
+        <HBox prefHeight="26.0" prefWidth="185.0" spacing="10.0">
+          <children>
+            <TextField fx:id="mSizeBox" prefWidth="65.0" promptText="Line size" />
+            <Button mnemonicParsing="false" prefWidth="110.0" text="Edit" onAction="#edit" />
+          </children>
+        </HBox>
+        <Label text="Functions:">
+          <VBox.margin>
+            <Insets top="20.0" />
+          </VBox.margin>
+        </Label>
+        <ListView fx:id="mList" prefHeight="283.0" prefWidth="185.0" />
+      </children>
+      <padding>
+        <Insets right="10.0" />
+      </padding>
+    </VBox>
   </right>
   <top>
     <HBox prefHeight="22.0" prefWidth="907.0" spacing="10.0">
@@ -48,18 +65,10 @@
         <TextField onAction="#setTitle" prefWidth="65.0" promptText="Set title" />
         <TextField onAction="#setXLabel" prefWidth="83.0" promptText="X axis label" />
         <TextField onAction="#setYLabel" prefWidth="83.0" promptText="Y axis label" />
-        <ChoiceBox>
-          <items>
-            <FXCollections fx:factory="observableArrayList">
-              <String fx:value="Dashed" />
-              <String fx:value="Dotted" />
-              <String fx:value="Solid" />
-            </FXCollections>
-          </items>
-        </ChoiceBox>
-        <ColorPicker />
-        <TextField prefWidth="96.0" promptText="Domian start" text="" onAction="#setDomainS"/>
-        <TextField prefWidth="96.0" promptText="Domain end" onAction="#setDomainE"/>
+        <TextField fx:id="dStart" onAction="#setDomainS" prefWidth="96.0" promptText="Domian start" text="" />
+        <TextField fx:id="dEnd" onAction="#setDomainE" prefWidth="96.0" promptText="Domain end" />
+        <TextField fx:id="cStart" onAction="#setCodomainS" prefWidth="96.0" promptText="Codomian start" text="" />
+        <TextField fx:id="cEnd" onAction="#setCodomainE" prefWidth="96.0" promptText="Codomian end" text="" />
       </children>
       <padding>
         <Insets left="20.0" />

@@ -4,6 +4,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.scene.paint.Color;
+
 import org.apache.commons.math3.analysis.function.Acosh;
 import org.apache.commons.math3.analysis.function.Asinh;
 import org.apache.commons.math3.analysis.function.Atanh;
@@ -18,11 +22,11 @@ import de.congrace.exp4j.UnknownFunctionException;
 import de.congrace.exp4j.UnparsableExpressionException;
 
 public class Calculator {
-	private List<Function> mFunctions;
+	private ObservableList<Function> mFunctions;
 	private Collection<CustomFunction> customs;
 
 	public Calculator() {
-		mFunctions = new ArrayList<Function>();
+		mFunctions = FXCollections.observableArrayList();
 		customs = new ArrayList<CustomFunction>();
 		CustomOperator mod = new CustomOperator("%", true, 3) {
 			@Override
@@ -107,7 +111,7 @@ public class Calculator {
 		}
 	}
 
-	public void addAndCalculate(String formula, double xStart, double xEnd,
+	public double[][] Calculate(String formula, double xStart, double xEnd,
 			int granulity) throws UnknownFunctionException, UnparsableExpressionException {
 		Calculable expression;
 		formula = formula.replaceAll("PI", "3.14159");
@@ -124,10 +128,31 @@ public class Calculator {
 			System.out.print(function[i][0] + " " + function[i][1] + "\n");
 		}
 		System.out.println();
-		mFunctions.add(new Function(formula, function));
+		return function;
 	}
 
-	public List<Function> getFunctions() {
+	public void addAndCalculate(String formula, double xStart, double xEnd,
+			int granulity, String type, Color color, int size)
+			throws UnknownFunctionException, UnparsableExpressionException {
+		Calculable expression;
+		formula = formula.replaceAll("PI", "3.14159");
+		formula = formula.replaceAll("E", "2.718281");
+		expression = new ExpressionBuilder(formula).withVariableNames("x")
+				.withCustomFunctions(customs).build();
+		double step = (xEnd - xStart) / granulity;
+
+		double[][] function = new double[granulity][2];
+		for (int i = 0; i < granulity; i++) {
+			function[i][0] = xStart;
+			function[i][1] = expression.calculate(xStart);
+			xStart += step;
+			System.out.print(function[i][0] + " " + function[i][1] + "\n");
+		}
+		System.out.println();
+		mFunctions.add(new Function(formula, function, size, color, type));
+	}
+
+	public ObservableList<Function> getFunctions() {
 		return mFunctions;
 
 	}
