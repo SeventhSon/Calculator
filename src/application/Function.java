@@ -1,5 +1,6 @@
 package application;
 
+import javafx.scene.chart.XYChart.Series;
 import javafx.scene.paint.Color;
 
 public class Function {
@@ -9,6 +10,7 @@ public class Function {
 	int size;
 	String type;
 	Color color;
+	Series<Number,Number> series;
 
 	@Override
 	public String toString() {

@@ -2,8 +2,6 @@ package application;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
-
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.paint.Color;
@@ -11,8 +9,6 @@ import javafx.scene.paint.Color;
 import org.apache.commons.math3.analysis.function.Acosh;
 import org.apache.commons.math3.analysis.function.Asinh;
 import org.apache.commons.math3.analysis.function.Atanh;
-import org.apache.commons.math3.util.MathUtils;
-
 import de.congrace.exp4j.Calculable;
 import de.congrace.exp4j.CustomFunction;
 import de.congrace.exp4j.CustomOperator;
@@ -116,6 +112,8 @@ public class Calculator {
 		Calculable expression;
 		formula = formula.replaceAll("PI", "3.14159");
 		formula = formula.replaceAll("E", "2.718281");
+		//Pattern p1 = Pattern.compile("(.+?)\\?(.+):(.+$)");
+		//Matcher m = p1.matcher(formula);
 		expression = new ExpressionBuilder(formula).withVariableNames("x")
 				.withCustomFunctions(customs).build();
 		double step = (xEnd - xStart) / granulity;

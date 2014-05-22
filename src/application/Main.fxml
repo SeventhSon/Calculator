@@ -26,7 +26,7 @@
         <TextField fx:id="mFormulaTextBox" onAction="#addFunction" prefWidth="200.0" promptText="Input formula" />
         <HBox prefHeight="29.0" prefWidth="185.0" spacing="8.0">
           <children>
-            <ColorPicker fx:id="mColorPicker" />
+            <ColorPicker fx:id="mColorPicker"/>
             <ChoiceBox fx:id="mTypeBox">
               <items>
                 <FXCollections fx:factory="observableArrayList">
@@ -49,7 +49,7 @@
             <Insets top="20.0" />
           </VBox.margin>
         </Label>
-        <ListView fx:id="mList" prefHeight="283.0" prefWidth="185.0" />
+        <ListView fx:id="mList" prefHeight="283.0" prefWidth="185.0" onMouseClicked="#select"/>
       </children>
       <padding>
         <Insets right="10.0" />

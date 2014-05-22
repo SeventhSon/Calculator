@@ -3,7 +3,6 @@ package application;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.List;
 import java.util.ResourceBundle;
 
 import javax.imageio.ImageIO;
@@ -18,6 +17,7 @@ import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.chart.LineChart;
@@ -71,14 +71,14 @@ public class MainController implements Initializable {
 	TextField cEnd;
 
 	ObservableList<String> type;
-	
+
 	Function dummy;
 
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
 		calculator = new Calculator();
-		dummy = new Function("", new double[][] { { 0 } }, 1,
-				new Color(0, 0, 0, 0), mTypeBox.getValue());
+		dummy = new Function("", new double[][] { { 0 } }, 1, new Color(0, 0,
+				0, 0), mTypeBox.getValue());
 		type = FXCollections.observableArrayList("Solid", "Dotted", "Dashed");
 		mTypeBox.setItems(type);
 		mTypeBox.setValue(type.get(0));
@@ -93,7 +93,6 @@ public class MainController implements Initializable {
 						if (temp != null) {
 							mFormulaTextBox.setText(temp.formula);
 							mSizeBox.setText("" + temp.size);
-							mColorPicker.setValue(temp.color);
 							mTypeBox.setValue(temp.type);
 						}
 					}
@@ -163,7 +162,9 @@ public class MainController implements Initializable {
 		mChart.getData().clear();
 		for (int j = 0; j < functions.size(); j++) {
 			Function f = functions.get(j);
-			XYChart.Series functionSeries = new XYChart.Series();
+			if (f.formula.equals(""))
+				continue;
+			XYChart.Series<Number, Number> functionSeries = new XYChart.Series();
 			functionSeries.setName(f.formula);
 			for (int i = 0; i < f.data.length; i++) {
 				if (!Double.isNaN(f.data[i][1])
@@ -176,6 +177,16 @@ public class MainController implements Initializable {
 				}
 			}
 			mChart.getData().add(functionSeries);
+			f.series = functionSeries;
+			String style = "";
+			if (f.type.equals("Dotted")) {
+				style += "-fx-stroke-dash-array: 0.1 9.0;";
+			} else if (f.type.equals("Dashed")) {
+				style += "-fx-stroke-dash-array: 8 8;-fx-stroke-dash-offset: 6;";
+			}
+			style += "-fx-stroke-width: " + f.size + "px;-fx-stroke: #"
+					+ Integer.toHexString(f.color.hashCode()) + ";";
+			((Node) f.series.nodeProperty().get()).setStyle(style);
 		}
 	}
 
@@ -184,10 +195,7 @@ public class MainController implements Initializable {
 		if (mList.getSelectionModel().getSelectedItem() != null) {
 			Function temp = (Function) mList.getSelectionModel()
 					.getSelectedItem();
-			mFormulaTextBox.setText(temp.formula);
-			mSizeBox.setText("" + temp.size);
 			mColorPicker.setValue(temp.color);
-			mTypeBox.setValue(temp.type);
 		}
 	}
 
