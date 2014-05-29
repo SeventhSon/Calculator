@@ -18,7 +18,7 @@ public class Main extends Application {
 			primaryStage.show();
 			primaryStage.setTitle("Functions' Graphical Calculator");
 			primaryStage.setMinHeight(500);
-			primaryStage.setMinWidth(900);
+			primaryStage.setMinWidth(950);
 		} catch(Exception e) {
 			e.printStackTrace();
 		}

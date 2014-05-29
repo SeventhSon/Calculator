@@ -2,6 +2,9 @@ package application;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.paint.Color;
@@ -9,6 +12,7 @@ import javafx.scene.paint.Color;
 import org.apache.commons.math3.analysis.function.Acosh;
 import org.apache.commons.math3.analysis.function.Asinh;
 import org.apache.commons.math3.analysis.function.Atanh;
+
 import de.congrace.exp4j.Calculable;
 import de.congrace.exp4j.CustomFunction;
 import de.congrace.exp4j.CustomOperator;
@@ -20,28 +24,70 @@ import de.congrace.exp4j.UnparsableExpressionException;
 public class Calculator {
 	private ObservableList<Function> mFunctions;
 	private Collection<CustomFunction> customs;
+	private Collection<CustomOperator> customops;
 
 	public Calculator() {
 		mFunctions = FXCollections.observableArrayList();
 		customs = new ArrayList<CustomFunction>();
-		CustomOperator mod = new CustomOperator("%", true, 3) {
-			@Override
-			protected double applyOperation(double[] values) {
-				if (values[1] == 0d) {
-					throw new ArithmeticException("Division by zero!");
+		customops = new ArrayList<CustomOperator>();
+
+		CustomOperator equal = new CustomOperator("==", true, 1, 2) {
+			public double applyOperation(double[] values) {
+				if (values[0] == values[1]) {
+					return 1d;
+				} else {
+					return 0d;
 				}
-				return values[0] % values[1];
 			}
 		};
-		CustomOperator factorial = new CustomOperator("!", true, 6, 1) {
-			@Override
-			protected double applyOperation(double[] values) {
-				double tmp = 1d;
-				int steps = 1;
-				while (steps < values[0]) {
-					tmp = tmp * (++steps);
+
+		CustomOperator notEqual = new CustomOperator("!=", true, 1, 2) {
+			public double applyOperation(double[] values) {
+				if (values[0] != values[1]) {
+					return 1d;
+				} else {
+					return 0d;
 				}
-				return tmp;
+			}
+		};
+
+		CustomOperator greaterEqual = new CustomOperator(">=", true, 1, 2) {
+			public double applyOperation(double[] values) {
+				if (values[0] >= values[1]) {
+					return 1d;
+				} else {
+					return 0d;
+				}
+			}
+		};
+
+		CustomOperator lessEqual = new CustomOperator("<=", true, 1, 2) {
+			public double applyOperation(double[] values) {
+				if (values[0] <= values[1]) {
+					return 1d;
+				} else {
+					return 0d;
+				}
+			}
+		};
+
+		CustomOperator greaterThen = new CustomOperator(">", true, 1, 2) {
+			public double applyOperation(double[] values) {
+				if (values[0] > values[1]) {
+					return 1d;
+				} else {
+					return 0d;
+				}
+			}
+		};
+
+		CustomOperator lessThen = new CustomOperator("<", true, 1, 2) {
+			public double applyOperation(double[] values) {
+				if (values[0] < values[1]) {
+					return 1d;
+				} else {
+					return 0d;
+				}
 			}
 		};
 		try {
@@ -101,6 +147,12 @@ public class Calculator {
 			customs.add(round);
 			customs.add(min);
 			customs.add(max);
+			customops.add(lessThen);
+			customops.add(greaterThen);
+			customops.add(lessEqual);
+			customops.add(greaterEqual);
+			customops.add(equal);
+			customops.add(notEqual);
 		} catch (InvalidCustomFunctionException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -108,22 +160,48 @@ public class Calculator {
 	}
 
 	public double[][] Calculate(String formula, double xStart, double xEnd,
-			int granulity) throws UnknownFunctionException, UnparsableExpressionException {
-		Calculable expression;
+			int granulity) throws UnknownFunctionException,
+			UnparsableExpressionException {
+		Calculable expression, ifexp = null;
+		boolean ifop=false;
 		formula = formula.replaceAll("PI", "3.14159");
 		formula = formula.replaceAll("E", "2.718281");
-		//Pattern p1 = Pattern.compile("(.+?)\\?(.+):(.+$)");
-		//Matcher m = p1.matcher(formula);
-		expression = new ExpressionBuilder(formula).withVariableNames("x")
-				.withCustomFunctions(customs).build();
-		double step = (xEnd - xStart) / granulity;
+		Pattern p1 = Pattern.compile("^(.+?)\\?(.+):(.+)$");
+		Matcher m = p1.matcher(formula);
 
 		double[][] function = new double[granulity][2];
+		double step = (xEnd - xStart) / granulity;
+		
+		if (m.find()) {
+			System.out.println("If "+m.group(1)+" then "+m.group(2)+" else "+m.group(3));
+			ifexp = new ExpressionBuilder(m.group(1))
+					.withVariableNames("x").withCustomFunctions(customs).withOperations(customops)
+					.build();
+			ifop = true;
+		}
+		
+
 		for (int i = 0; i < granulity; i++) {
+			if(ifop){
+				if (ifexp.calculate(xStart) == 1) {
+					expression = new ExpressionBuilder(m.group(2))
+							.withVariableNames("x")
+							.withCustomFunctions(customs).build();
+				} else {
+					expression = new ExpressionBuilder(m.group(3))
+							.withVariableNames("x")
+							.withCustomFunctions(customs).build();
+				}
+
+			} else {
+				expression = new ExpressionBuilder(formula)
+						.withVariableNames("x").withCustomFunctions(customs)
+						.build();
+			}
 			function[i][0] = xStart;
 			function[i][1] = expression.calculate(xStart);
-			xStart += step;
 			System.out.print(function[i][0] + " " + function[i][1] + "\n");
+			xStart += step;
 		}
 		System.out.println();
 		return function;
@@ -132,22 +210,8 @@ public class Calculator {
 	public void addAndCalculate(String formula, double xStart, double xEnd,
 			int granulity, String type, Color color, int size)
 			throws UnknownFunctionException, UnparsableExpressionException {
-		Calculable expression;
-		formula = formula.replaceAll("PI", "3.14159");
-		formula = formula.replaceAll("E", "2.718281");
-		expression = new ExpressionBuilder(formula).withVariableNames("x")
-				.withCustomFunctions(customs).build();
-		double step = (xEnd - xStart) / granulity;
-
-		double[][] function = new double[granulity][2];
-		for (int i = 0; i < granulity; i++) {
-			function[i][0] = xStart;
-			function[i][1] = expression.calculate(xStart);
-			xStart += step;
-			System.out.print(function[i][0] + " " + function[i][1] + "\n");
-		}
-		System.out.println();
-		mFunctions.add(new Function(formula, function, size, color, type));
+		mFunctions.add(new Function(formula, Calculate(formula, xStart, xEnd,
+				granulity), size, color, type));
 	}
 
 	public ObservableList<Function> getFunctions() {

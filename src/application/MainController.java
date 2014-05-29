@@ -235,7 +235,7 @@ public class MainController implements Initializable {
 			} catch (UnknownFunctionException | UnparsableExpressionException e) {
 				((TextField) event.getSource())
 						.setStyle("-fx-border-color: red;");
-				// e.printStackTrace();
+				e.printStackTrace();
 			}
 			mList.getSelectionModel().select(
 					mList.getItems().get(mList.getItems().size() - 1));
